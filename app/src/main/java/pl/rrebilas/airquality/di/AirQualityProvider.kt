@@ -10,7 +10,9 @@ import okhttp3.Response
 import pl.rrebilas.airquality.data.AirlyStationsDataSource
 import pl.rrebilas.airquality.data.airly.AirlyEndpoint
 import pl.rrebilas.airquality.data.airly.AirlyService
+import pl.rrebilas.airquality.data.local.InMemoryStationsRepository
 import pl.rrebilas.airquality.di.entity.RemoteStationsRepository
+import pl.rrebilas.airquality.di.logic.repository.LocalStationsRepository
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
@@ -22,6 +24,13 @@ object AirQualityProvider {
     @Singleton
     fun provideRemoteStationsRepository(airlyService: AirlyService): RemoteStationsRepository {
         return AirlyStationsDataSource(airlyService)
+    }
+
+    @Provides
+    @Singleton
+    fun provideLocalStationsRepository(): LocalStationsRepository {
+        // TODO
+        return InMemoryStationsRepository()
     }
 
     @Provides

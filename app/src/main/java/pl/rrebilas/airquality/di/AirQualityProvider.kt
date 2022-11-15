@@ -8,6 +8,8 @@ import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.Response
 import pl.rrebilas.airquality.data.AirlyStationsDataSource
+import pl.rrebilas.airquality.data.airly.AirlyEndpoint
+import pl.rrebilas.airquality.data.airly.AirlyService
 import pl.rrebilas.airquality.di.entity.RemoteStationsRepository
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -18,7 +20,7 @@ import javax.inject.Singleton
 object AirQualityProvider {
     @Provides
     @Singleton
-    fun provideRemoteStationsRepository(airlyService: AirlyStationsDataSource.AirlyService): RemoteStationsRepository {
+    fun provideRemoteStationsRepository(airlyService: AirlyService): RemoteStationsRepository {
         return AirlyStationsDataSource(airlyService)
     }
 
@@ -37,14 +39,14 @@ object AirQualityProvider {
             .Builder()
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
-            .baseUrl(AirlyStationsDataSource.HOST)
+            .baseUrl(AirlyEndpoint.HOST)
             .build()
     }
 
     @Provides
     @Singleton
-    fun provideAirlyService(retrofit: Retrofit): AirlyStationsDataSource.AirlyService {
-        return retrofit.create(AirlyStationsDataSource.AirlyService::class.java)
+    fun provideAirlyService(retrofit: Retrofit): AirlyService {
+        return retrofit.create(AirlyService::class.java)
     }
 }
 

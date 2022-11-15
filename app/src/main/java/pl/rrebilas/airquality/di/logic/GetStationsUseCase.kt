@@ -14,7 +14,8 @@ class GetStationsUseCase @Inject constructor(
         val localStations = localStationsRepository.getAll()
         if (localStations.isEmpty()) {
             val remoteStations = remoteStationsRepository.getAll()
-            return emptyList()
+            localStationsRepository.save(remoteStations)
+            return remoteStations
         }
         return localStations
     }

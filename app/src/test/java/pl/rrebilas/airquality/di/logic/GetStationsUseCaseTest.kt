@@ -66,7 +66,40 @@ class GetStationsUseCaseTest {
         assertEquals(1, local.getAllCallsCount)
     }
 
-    private var sampleAQStation = AQStation("id", "name", "city", "sponsor", "")
+    @Test
+    fun executeReturnLocalStationsWhenRemoteStationRepositoryIsCalled() = runBlocking {
+        local.getAllResults = emptyList()
+        remote.getAllResults = listOf(sampleAQStation)
+
+        val actual = sut.execute()
+
+        assertEquals("1", actual.first().id)
+    }
+
+    @Test
+    fun executeSavesStationsToLocalWhenRemoteIsNonEmpty() = runBlocking {
+        local.getAllResults = emptyList()
+        remote.getAllResults = listOf(sampleAQStation)
+
+        sut.execute()
+
+        assertEquals(true, local.saveCalled)
+        assertEquals("1", local.saveReceivedArguments.first().id)
+    }
+
+    @Test
+    fun executesReturnValidLocalListStations() = runBlocking {
+        val sampleAQStation2 = AQStation("2", "name", "city", "sponsor", "")
+        local.getAllResults = listOf(sampleAQStation, sampleAQStation2)
+
+        val actual = sut.execute()
+
+        assertEquals("1", actual.first().id)
+        assertEquals("2", actual[1].id)
+
+    }
+
+    private var sampleAQStation = AQStation("1", "name", "city", "sponsor", "")
 }
 
 class MockLocalStationsRepository : LocalStationsRepository {
@@ -78,6 +111,7 @@ class MockLocalStationsRepository : LocalStationsRepository {
     val saveCalled: Boolean
         get() = saveAllCallsCount > 0
     var saveAllCallsCount: Int = 0
+    var saveReceivedArguments: List<AQStation> = emptyList()
 
     override suspend fun getAll(): List<AQStation> {
         getAllCallsCount++
@@ -85,6 +119,7 @@ class MockLocalStationsRepository : LocalStationsRepository {
     }
 
     override suspend fun save(stations: List<AQStation>) {
+        saveReceivedArguments = stations
         saveAllCallsCount++
     }
 
@@ -94,8 +129,10 @@ class MockRemoteStationsRepository : RemoteStationsRepository {
     val getAllCalled: Boolean
         get() = getAllCallsCount > 0
     var getAllCallsCount: Int = 0
+    var getAllResults: List<AQStation> = emptyList()
+
     override suspend fun getAll(): List<AQStation> {
         getAllCallsCount++
-        return listOf()
+        return getAllResults
     }
 }
